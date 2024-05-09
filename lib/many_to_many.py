@@ -1,86 +1,104 @@
+from datetime import datetime
+
 class Author:
+
     all_authors = []
 
-    def __init__(self, name):
+    def __init__(self, name:str):
         self.name = name
-        self.__class__.all_authors.append(self)
+        Author.all_authors.append(self)
+    
+    def contracts(self):
+        return [cnt for cnt in Contract.all if cnt.author == self]
+    
+    def books(self):
+        return [cnt.book for cnt in Contract.all if cnt.author == self]
+    
+    def sign_contract(self, book, date, royalties):
+        return Contract(self, book, date, royalties)
+    
+    def total_royalties(self):
+        total = 0
 
-    @property
-    def name(self):
-        return self._name
+        for contract in Contract.all:
+            if contract.author == self:
+                total += contract.royalties
 
-    @name.setter
-    def name(self, value):
-        if not isinstance(value, str):
-            raise Exception("Name must be a string")
-        self._name = value
+        return total
 
 
 
 class Book:
+
     all_books = []
 
-    def __init__(self, title):
+    def __init__(self, title:str):
         self.title = title
-        self.__class__.all_books.append(self)
+        Book.all_books.append(self)
+    pass
 
-    @property
-    def title(self):
-        return self._title
-
-    @title.setter
-    def title(self, value):
-        if not isinstance(value, str):
-            raise Exception("Title must be a string")
-        self._title = value
+    def contracts(self):
+        return [cnt for cnt in Contract.all if cnt.book == self]
+    
+    def authors(self):
+        return [cnt.author for cnt in Contract.all if cnt.book == self]
 
 
 class Contract:
-    all_contracts = []
 
-    def __init__(self, author, book, date, royalties):
+    all = []
+
+    def __init__(self, author:Author, book:Book, date:str, royalties:int):
         self.author = author
         self.book = book
         self.date = date
         self.royalties = royalties
-        self.__class__.all_contracts.append(self)
-
-    @property
-    def author(self):
-        return self._author
-
-    @author.setter
-    def author(self, value):
-        if not isinstance(value, Author):
-            raise Exception("Author must be an instance of the Author class")
-        self._author = value
-
-    @property
-    def book(self):
-        return self._book
-
-    @book.setter
-    def book(self, value):
-        if not isinstance(value, Book):
-            raise Exception("Book must be an instance of the Book class")
-        self._book = value
+        Contract.all.append(self)
 
     @property
     def date(self):
         return self._date
-
+    
     @date.setter
     def date(self, value):
-        if not isinstance(value, str):
-            raise Exception("Date must be a string")
-        self._date = value
+        if type(value) == str:
+            self._date = value
+        else:
+            raise TypeError("Must be of type string")
 
+    @property
+    def book(self):
+        return self._book
+    
+    @book.setter
+    def book(self, value):
+        if type(value) == Book:
+            self._book = value
+        else:
+            raise TypeError("Must be of type Book")
+        
+    @property
+    def author(self):
+        return self._author
+    
+    @author.setter
+    def author(self, value):
+        if type(value) == Author:
+            self._author = value
+        else:
+            raise TypeError("Must be of type Author")
+        
     @property
     def royalties(self):
         return self._royalties
-
+    
     @royalties.setter
     def royalties(self, value):
-        if not isinstance(value, int):
-            raise Exception("Royalties must be an integer")
-        self._royalties = value
+        if type(value) == int:
+            self._royalties = value
+        else:
+            raise TypeError("Must be of type Integer")
+        
+    @classmethod
+    def contracts_by_date(cls, date):
+        return [contract for contract in cls.all if contract.date == date]
